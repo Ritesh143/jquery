@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>practise2</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+<!-- <link type="text/css" rel="stylesheet" href="pagination/simplePagination.css"/>
+ --><!-- <script type="text/javascript" src="pagination/tests/lib/jquery.min.js"></script> -->
+<!-- <script type="text/javascript" src="pagination/jquery.simplePagination.js"></script> -->
+
+
+</head>
+<body>
+<div id="upper">
+	<h1>Search a movie by its Title</h1>
+	<form>
+		<h3 class="pull-left">Search</h3>  
+		<input type="text" id="search" class="pull-left" placeholder="Type a movie name">
+	</form>
+			<button id="go" type="submit">submit</button>
+</div>
+<!-- <div class="container">
+	<div class="row" id="resultValues">
+	</div>
+	<ul id="pagination">
+		
+	</ul>
+</div> -->
+<div class="container">
+	<div class="well well-lg" id="searchResults">
+       <input type='hidden' id='current_page' />  
+       <input type='hidden' id='show_per_page' />
+       <div class="page-header">
+           <h1 class="textColor">search results.......</h1>
+       </div>
+           <div class="rows" id="resultValues">
+           </div>
+       <div class="col-lg-12" id='page_navigation'></div>  
+	</div><!-- well ends here -->
+</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<script>
+$(document).ready(function(){
+	var $title= $('#resultValues');
+	var $s=$('#search');
+	$('#searchResults').hide();
+	$('#go').on('click',function()
+	{
+		$.ajax({
+			type: 'GET',
+			url: 'http://www.omdbapi.com/?s='+$s.val(),
+			success: function(data)
+			{
+				if(data.Response=='False')
+            	alert('No such Movie');
+				// console.log('success',data);
+				$.each(data.Search,function(i,order)
+				{
+					$('#searchResults').show();
+					$title.append('<div class="col-sm-4"><h2>'+order.Title+'</h2><center><img class="img-responsive" src="'+order.Poster+'" alt="No result Values"></center></div>');
+				
+					// var $items=5;
+					// var $pages=$(data.Search.length/$items);
+					// console.log($pages);
+					// for (var i = 0; i < $pages; i++) {
+					// 	console.log(i);
+					// 	$('#pagination').append('<li><button type="submit">'+i+'</button></li>');
+					// }
+				});
+				//how much items per page to show  
+               var show_per_page = 2;
+               //getting the amount of elements inside content div  
+               var number_of_items = data.Search.length;
+               //calculate the number of pages we are going to have  
+               var number_of_pages = Math.ceil(number_of_items / show_per_page);
+               if (number_of_pages === 1) {
+                   $('#page_navigation').hide();
+               } else {
+                   $('#page_navigation').show();
+               }
+               //set the value of our hidden input fields  
+               $('#current_page').val(0);
+               $('#show_per_page').val(show_per_page);
+               /*
+               what are we going to have in the navigation?
+                   - link to previous page
+                   - links to specific pages
+                   - link to next page
+               */
+               var navigation_html = '<a class="previous_link" href="javascript:previous();">Prev</a>&nbsp;&nbsp;';
+               var current_link = 0;
+               while (number_of_pages > current_link) {
+                   navigation_html += '<a class="page_link" href="javascript:go_to_page(' + current_link + ')" longdesc="' + current_link + '">' + (current_link + 1) + '</a>&nbsp;&nbsp;';
+                   current_link++;
+               }
+               navigation_html += '<a class="next_link" href="javascript:next();">Next</a>'; 
+               $('#page_navigation').html(navigation_html);                        //add active_page class to the first page link  
+               $('#page_navigation .page_link:first').addClass('active_page');                        //hide all the elements inside content div  
+               $('#resultValues').children().css('display', 'none');                        //and show the first n (show_per_page) elements  
+               $('#resultValues').children().slice(0, show_per_page).css('display', 'block');
+
+            },
+
+			error: function(){
+				alert('No such movie');
+			}
+	    });
+	});
+
+			
+
+
+});
+
+
+function previous() 
+{
+	new_page = parseInt($('#current_page').val()) - 1;
+   //if there is an item before the current active link run the function  
+   if ($('.active_page').prev('.page_link').length == true) {
+       go_to_page(new_page);
+   }
+}
+
+
+function next() 
+{
+   new_page = parseInt($('#current_page').val()) + 1;
+   //if there is an item after the current active link run the function  
+   if ($('.active_page').next('.page_link').length == true) {
+       go_to_page(new_page);
+   }
+}
+
+function go_to_page(page_num) 
+{
+   //get the number of items shown per page  
+   var show_per_page = parseInt($('#show_per_page').val());
+   console.log("show_per_page:" + show_per_page);
+   //get the element number where to start the slice from
+   console.log("page_num " + page_num);
+   start_from = page_num * show_per_page;    //get the element number where to end the slice  
+   end_on = start_from + show_per_page;    //hide all children elements of content div, get specific items and show them  
+   $('#resultValues').children().css('display', 'none').slice(start_from, end_on).css('display', 'block');    /*get the page link that has longdesc attribute of the current page and add active_page class to it
+   and remove that class from previously active page link*/
+   $('.page_link[longdesc=' + page_num + ']').addClass('active_page').siblings('.active_page').removeClass('active_page');    //update the current page input field  
+   $('#current_page').val(page_num);
+}
+
+</script>
+</html>
+
