@@ -1,0 +1,36 @@
+h1{
+		color: green;
+		letter-spacing: 10px;
+		text-align: center;
+	}
+
+	h3{
+		margin: 0px 10px;
+	}
+	#upper{
+		background-color: rgba(0,0,0,0.1);
+		padding: 10px;
+		margin-bottom: 20px;
+	}
+
+	label{
+		font-size: 20px;
+	}
+
+		.container #resultValues h2,img{
+			text-align: center;
+		}
+
+		.col-sm-4 {
+    height: 600px;
+    border: dotted;
+    border-color: brown;
+}
+#searchResults {
+	height: 800px;
+	text-align: center;
+}
+
+#page_navigation{
+	text-align: center;
+}
